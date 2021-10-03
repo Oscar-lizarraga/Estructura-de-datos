@@ -18,10 +18,13 @@
 
 void ImprimirResultado(int a);
 void ImprimirMenu();
+void MostrarUsuarios(Usuario *usuario, int cantidad);
+
 int RegistrarUsuario(Usuario usuario);
 int EliminarUsuario();
 int ModificarUsuario();
-int MostrarUsuarios();
+int BuscarUsuarios();
+int BuscarUsuario(char* username);
 
 
 
@@ -29,7 +32,7 @@ int MostrarUsuarios();
 int main(int argc, char const *argv[])
 {
 	Usuario usuario;
-
+	char aux_username[64];
 	int opcion;
 	do
 	{
@@ -42,9 +45,13 @@ int main(int argc, char const *argv[])
 				ImprimirResultado(RegistrarUsuario(usuario));
 				break;
 			case 2:
-				MostrarUsuarios();
+				ImprimirResultado(BuscarUsuarios());
 				break;
 			case 3:
+				printf("\t Ingrese el username a buscar: ");
+				fgets(aux_username,sizeof(aux_username),stdin);
+				LimpiarCadena(aux_username);
+				BuscarUsuario(aux_username);
 				break;
 			case 4:
 				break;
@@ -76,11 +83,10 @@ int RegistrarUsuario(Usuario usuario)
 	}
 }
 
-int MostrarUsuarios()
+int BuscarUsuarios()
 {
 	FILE* file;
 	Usuario *usuario;
-	Usuario aux_usuario;
 	int cantidad;
 
 	file = fopen("usuarios.dat","rb");
@@ -108,12 +114,70 @@ int MostrarUsuarios()
 			fread(&usuario[i],sizeof(usuario[i]),1,file);
 			i++;
 		}
-		printf("%s",usuario[0].nombre());
 		fclose(file);
-
+		MostrarUsuarios(usuario, cantidad);
 		return 1;
 	}
 }
+
+int BuscarUsuario(char *username)
+{
+	FILE* file;
+	Usuario *usuario;
+	int cantidad;
+
+	file = fopen("usuarios.dat","rb");
+	if(file == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		//posicionamos el puntero al final del archivo
+		fseek(file, 0, SEEK_END); 
+		
+		//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+		cantidad = ftell(file) / sizeof(Usuario); 
+		
+		//reservamos memoria para la cantidad de usuarios que hay
+		usuario = (Usuario*)malloc(cantidad * sizeof(Usuario));
+		
+		//posicionamos el puntero al inicio del archivo
+		fseek(file, 0, SEEK_SET);
+		
+		int i = 0;
+		while(!feof(file))
+		{
+			fread(&usuario[i],sizeof(usuario[i]),1,file);
+			if (strcmp(usuario[i].userName(),username) == 0)
+			{
+				MostrarUsuarios(&usuario[i],1);
+				break;
+			}
+			i++;
+		}
+
+		fclose(file);
+		return 1;
+	}
+}
+
+void MostrarUsuarios(Usuario *usuario, int cantidad)
+{
+	printf("\n\t\t    ==> Listado de usuarios registrados <==\n");
+	printf("     ---------------------------------------------------------------------------------------\n");
+	printf("\t%s %s %s %8s %10s %10s %10s %10s %10s \n", 
+			"idUsuario", "userName", "password", "nombre", "primerApellido", "segundoApellido", "e-mail", "telefono", "sexo");
+	printf("     ---------------------------------------------------------------------------------------\n");
+	for (int i = 0; i < cantidad; i++)
+	{
+		printf("\t%d %s %s %8s %15s %10s %10s %10s\n",usuario[i].idUsuario(), usuario[i].userName(), usuario[i].password(), 
+			usuario[i].nombre(), usuario[i].primerApellido(),usuario[i].segundoApellido(), usuario[i].email(), usuario[i].telefono());
+	}
+
+}
+
+
 
 
 
@@ -140,7 +204,7 @@ void ImprimirResultado(int a)
 	}
 	else
 	{
-		printf("\n\t La operacion no se realizo correctamente");
+		printf("\n\t No se encontro el archivo");
 	}
 }
 
@@ -158,6 +222,9 @@ void ImprimirResultado(int a)
 
 	fseek
 	https://www.tutorialspoint.com/c_standard_library/c_function_fseek.htm
+
+	fread
+	https://www.tutorialspoint.com/c_standard_library/c_function_fread.htm
 */
 
 

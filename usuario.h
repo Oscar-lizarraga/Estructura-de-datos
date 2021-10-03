@@ -26,8 +26,8 @@ typedef struct user
 
 	public:
 
-		int isUsuario(){return this->_idUsuario;}
-		char* username(){return this->_username;}
+		int idUsuario(){return this->_idUsuario;}
+		char* userName(){return this->_username;}
 		char* password(){return this->_password;}
 		char* nombre(){return this->_nombre;}
 		char* primerApellido(){return this->_primerApellido;}
@@ -49,7 +49,7 @@ typedef struct user
 
 			printf("\t Ingrese su contrasena: ");
 			fgets(_password,sizeof(_password),stdin);
-			LimpiarCadena(_username);
+			LimpiarCadena(_password);
 
 			printf("\t Ingrese su nombre: ");
 			fgets(_nombre,sizeof(_nombre),stdin);
