@@ -13,7 +13,7 @@ enum Sexo
 
 typedef struct user 
 {
-	public:
+	private:
 		int _idUsuario;
 		char _username[64];
 		char _password[16];
@@ -25,7 +25,6 @@ typedef struct user
 		enum Sexo _sexo;
 
 	public:
-
 		int idUsuario(){return this->_idUsuario;}
 		char* userName(){return this->_username;}
 		char* password(){return this->_password;}
@@ -96,6 +95,7 @@ void LeerEntero(int *a)
 	}
 }
 
+//Limpiamos cadena porque la funcion fgets deja un espacio al final de cada read
 void LimpiarCadena(char *cadena)
 {
 	int longitud = strlen(cadena);

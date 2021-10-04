@@ -21,8 +21,8 @@ void ImprimirMenu();
 void MostrarUsuarios(Usuario *usuario, int cantidad);
 
 int RegistrarUsuario(Usuario usuario);
-int EliminarUsuario();
-int ModificarUsuario();
+int EliminarUsuario(char *username);
+int ModificarUsuario(char *username);
 int BuscarUsuarios();
 int BuscarUsuario(char* username);
 
@@ -54,6 +54,10 @@ int main(int argc, char const *argv[])
 				BuscarUsuario(aux_username);
 				break;
 			case 4:
+				printf("\t Ingrese el username a eliminar: ");
+				fgets(aux_username,sizeof(aux_username),stdin);
+				LimpiarCadena(aux_username);
+				EliminarUsuario(aux_username);
 				break;
 			case 5:
 				break;
@@ -146,9 +150,8 @@ int BuscarUsuario(char *username)
 		fseek(file, 0, SEEK_SET);
 		
 		int i = 0;
-		while(!feof(file))
-		{
-			fread(&usuario[i],sizeof(usuario[i]),1,file);
+		while (!feof(file)) {
+			fread(&usuario[i], sizeof(usuario[i]), 1, file);
 			if (strcmp(usuario[i].userName(),username) == 0)
 			{
 				MostrarUsuarios(&usuario[i],1);
@@ -177,15 +180,6 @@ void MostrarUsuarios(Usuario *usuario, int cantidad)
 
 }
 
-
-
-
-
-
-
-
-
-
 void ImprimirMenu()
 {
 	printf("\n\t --- Sistema de control de usuarios --- ");
@@ -205,6 +199,45 @@ void ImprimirResultado(int a)
 	else
 	{
 		printf("\n\t No se encontro el archivo");
+	}
+}
+
+void EditarUsuario()
+{
+
+}
+
+int EliminarUsuario(char *username)
+{
+	FILE* file;
+	FILE* ax_file;
+	Usuario usuario;
+	int cantidad;
+
+	file = fopen("usuarios.dat","rb");
+	ax_file = fopen("temporal.dat","wb");
+	if(file == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		int i = 0;
+		while (!feof(file)) {
+			fread(&usuario, sizeof(usuario), 1, file);
+			if (strcmp(usuario.userName(),username) != 0)
+			{
+				fwrite(&usuario,sizeof(usuario),1,ax_file);
+			}
+			i++;
+		}
+		
+		fclose(file);
+		fclose(ax_file);
+
+		remove("usuarios.dat");
+		rename("temporal.dat", "usuarios.dat");
+		return 1;
 	}
 }
 
