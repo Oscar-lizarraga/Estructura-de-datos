@@ -25,19 +25,29 @@ typedef struct user
 		enum Sexo _sexo;
 
 	public:
-		int idUsuario(){return this->_idUsuario;}
-		char* userName(){return this->_username;}
+		int getidUsuario(){return this->_idUsuario;}
+		char* getuserName(){return this->_username;}
+		char* getpassword(){return this->_password;}
+		char* getnombre(){return this->_nombre;}
+		char* getprimerApellido(){return this->_primerApellido;}
+		char* getsegundoApellido(){return this->_segundoApellido;}
+		char* getemail(){return this->_email;}
+		char* gettelefono(){return this->_telefono;}
+		Sexo getsexo(){return this->_sexo;}
+
+		/*void idUsuario(int idUsuario){this->_idUsuario = idUsuario}
+		void userName(){return this->_username;}
 		char* password(){return this->_password;}
 		char* nombre(){return this->_nombre;}
 		char* primerApellido(){return this->_primerApellido;}
 		char* segundoApellido(){return this->_segundoApellido;}
 		char* email(){return this->_email;}
 		char* telefono(){return this->_telefono;}
-		Sexo sexo(){return this->_sexo;}
+		Sexo sexo(){return this->_sexo;}*/
 
 
 
-		int DatosUsuario()
+		int IngresarDatos()
 		{
 			printf("\n\t Ingrese el id: ");
 			LeerEntero(&_idUsuario);
