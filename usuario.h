@@ -25,6 +25,7 @@ typedef struct user
 		enum Sexo _sexo;
 
 	public:
+
 		int getidUsuario(){return this->_idUsuario;}
 		char* getuserName(){return this->_username;}
 		char* getpassword(){return this->_password;}
@@ -34,17 +35,6 @@ typedef struct user
 		char* getemail(){return this->_email;}
 		char* gettelefono(){return this->_telefono;}
 		Sexo getsexo(){return this->_sexo;}
-
-		/*void idUsuario(int idUsuario){this->_idUsuario = idUsuario}
-		void userName(){return this->_username;}
-		char* password(){return this->_password;}
-		char* nombre(){return this->_nombre;}
-		char* primerApellido(){return this->_primerApellido;}
-		char* segundoApellido(){return this->_segundoApellido;}
-		char* email(){return this->_email;}
-		char* telefono(){return this->_telefono;}
-		Sexo sexo(){return this->_sexo;}*/
-
 
 
 		int IngresarDatos()
@@ -92,6 +82,230 @@ typedef struct user
 			return 0;
 		}
 
+		static user* BuscarUsuarios(int* cantidad)
+		{
+			FILE* file;
+			user *usuario;
+
+
+			file = fopen("usuarios.dat","rb");
+			if(file == NULL)
+			{
+				return 0;
+			}
+			else
+			{
+				//posicionamos el puntero al final del archivo
+				fseek(file, 0, SEEK_END); 
+				
+				//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+				*cantidad = ftell(file) / sizeof(user); 
+						printf("%d\n",*cantidad);
+				//reservamos memoria para la cantidad de usuarios que hay
+				usuario = (user*)malloc((*cantidad) * sizeof(user));
+				
+				//posicionamos el puntero al inicio del archivo
+				fseek(file, 0, SEEK_SET);
+				
+				int i = 0;
+				while(!feof(file))
+				{
+					fread(&usuario[i],sizeof(user),1,file);
+					i++;
+				}
+				fclose(file);
+				return usuario;
+			}
+		}
+
+		static int RegistrarUsuario(user usuario)
+		{
+			FILE* file;
+			file = fopen("usuarios.dat","ab");
+
+			if(file == NULL)
+			{
+				return 0;
+			}
+			else
+			{
+				fwrite(&usuario, sizeof(user), 1, file);
+				fclose(file);
+				return 1;
+			}
+		}		
+
+		static user BuscarUsuario(char *username)
+		{
+			FILE* file;
+			user *usuario, aux_usuario;
+			int cantidad;
+
+			file = fopen("usuarios.dat","rb");
+			if(file == NULL)
+			{
+				printf("ERROR en la apertura");
+			}
+			else
+			{
+				//posicionamos el puntero al final del archivo
+				fseek(file, 0, SEEK_END); 
+				
+				//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+				cantidad = ftell(file) / sizeof(user); 
+				
+				//reservamos memoria para la cantidad de usuarios que hay
+				usuario = (user*)malloc(cantidad * sizeof(user));
+				
+				//posicionamos el puntero al inicio del archivo
+				fseek(file, 0, SEEK_SET);
+				
+				int i = 0;
+				while (!feof(file)) {
+					fread(&usuario[i], sizeof(user), 1, file);
+					if (strcmp(usuario[i].getuserName(),username) == 0)
+					{
+						aux_usuario = usuario[i]; 
+						//MostrarUsuarios(&usuario[i],1);
+						break;
+					}
+					i++;
+				}
+				fclose(file);
+				return aux_usuario;
+			}
+		}
+
+		static void EliminarUsuario(char *username)
+		{
+			FILE* file;
+			FILE* ax_file;
+			user *usuario;
+			int cantidad;
+
+			file = fopen("usuarios.dat","rb");
+			ax_file = fopen("temporal.dat","wb");
+
+			if(file == NULL)
+			{
+				printf("ERROR en la apertura");
+			}
+			else
+			{
+				//posicionamos el puntero al final del archivo
+				fseek(file, 0, SEEK_END); 
+				
+				//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+				cantidad = ftell(file) / sizeof(user);
+				printf("%d",cantidad); 
+				
+				//reservamos memoria para la cantidad de usuarios que hay
+				usuario = (user*)malloc(cantidad * sizeof(user));
+				
+				//posicionamos el puntero al inicio del archivo
+				fseek(file, 0, SEEK_SET);
+				
+				for (int i = 0; i < cantidad; i++)
+				{
+					fread(&usuario[i], sizeof(user), 1, file);
+					if (strcmp(usuario[i].getuserName(),username) != 0)
+					{				
+						fwrite(&usuario[i],sizeof(user),1,ax_file);
+					}
+				}
+
+				fclose(file);
+				fclose(ax_file);
+
+				remove("usuarios.dat");
+				rename("temporal.dat", "usuarios.dat");
+				printf("\n\tELIMINACION realizada correctamente");
+			}
+		}
+
+		static void EditarUsuario(char *username)
+		{
+			FILE* file;
+			user *usuario;
+			int cantidad;
+
+			file = fopen("usuarios.dat","rb+");
+			if(file == NULL)
+			{
+				printf("ERROR en la apertura");
+			}
+			else
+			{
+				//posicionamos el puntero al final del archivo
+				fseek(file, 0, SEEK_END); 
+				
+				//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+				cantidad = ftell(file) / sizeof(user); 
+				
+				//reservamos memoria para la cantidad de usuarios que hay
+				usuario = (user*)malloc(cantidad * sizeof(user));
+				
+				//posicionamos el puntero al inicio del archivo
+				fseek(file, 0, SEEK_SET);
+				
+				for (int i = 0; i < cantidad; i++)
+				{
+					fread(&usuario[i], sizeof(user), 1, file);
+					if (strcmp(usuario[i].getuserName(),username) == 0)
+					{		
+						fseek(file,ftell(file)-sizeof(user), SEEK_SET);
+						usuario[i].IngresarDatos();	
+						fwrite(&usuario[i],sizeof(user),1,file);
+						break;
+					}
+				}
+				fclose(file);
+				printf("\n\t EDICION registrada correctamente");
+			}
+		}
+
+		static bool ValidarAcceso(char *username, char *contrasena)
+		{
+			FILE* file;
+			user *usuario, aux_usuario;
+			int cantidad;
+
+			file = fopen("usuarios.dat","rb");
+			if(file == NULL)
+			{
+				return false;
+				printf("ERROR en la apertura");
+			}
+			else
+			{
+				//posicionamos el puntero al final del archivo
+				fseek(file, 0, SEEK_END); 
+				
+				//obtenemos la cantidad de usuarios, ftell devuelve la cantidad de bits y lo dividimos entre la cantidad de usuarios
+				cantidad = ftell(file) / sizeof(user); 
+				
+				//reservamos memoria para la cantidad de usuarios que hay
+				usuario = (user*)malloc(cantidad * sizeof(user));
+				
+				//posicionamos el puntero al inicio del archivo
+				fseek(file, 0, SEEK_SET);
+				
+				int i = 0;
+				while (!feof(file)) {
+					fread(&usuario[i], sizeof(user), 1, file);
+					if (strcmp(usuario[i].getuserName(),username) == 0 && strcmp(usuario[i].getpassword(),contrasena) == 0)
+					{
+						return true;
+						break;
+					}
+					i++;
+				}
+				fclose(file);
+				return false;
+			}
+		}		
+
+
 }Usuario;
 
 
@@ -114,3 +328,4 @@ void LimpiarCadena(char *cadena)
 		cadena[longitud - 1] = '\0';
 	}
 }
+
