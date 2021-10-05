@@ -27,22 +27,24 @@ int main(int argc, char const *argv[])
 	char aux_username[64];
 	char aux_password[16];
 	int opcion, cantidad;
-	bool acceso = false;	
+	bool acceso = true;	
 	do
 	{
+		acceso = true;
 		printf("\n\t Ingrese username: ");
 		fgets(aux_username,sizeof(aux_username),stdin);
 		LimpiarCadena(aux_username);
-		printf("\n\t Ingrese contrasena: ");
+		printf("\t Ingrese contrasena: ");
 		fgets(aux_password,sizeof(aux_password),stdin);
 		LimpiarCadena(aux_password);		
-		acceso = user::ValidarAcceso(aux_username,aux_password);
-		if (!acceso)
+		if((strcmp(aux_password,"mac1351") != 0) || (strcmp(aux_username,"root") != 0))
 		{
 			printf("\n\t Datos incorrectos");
+			acceso = false;
 		}
-	}while(acceso == 0);
+	}while(!acceso);
 
+	acceso = true;
 	do
 	{
 		ImprimirMenu();
@@ -76,10 +78,11 @@ int main(int argc, char const *argv[])
 				LimpiarCadena(aux_username);
 				user::EliminarUsuario(aux_username);
 				break;
-			default:
+			case 6:
+				acceso = false;
 				break;
 		}
-	} while (opcion < 1 || opcion >5);
+	} while (acceso);
 
 	return 0;
 }
@@ -115,6 +118,7 @@ void ImprimirMenu()
 	printf("\n\t [3] Buscar datos de usuario ");
 	printf("\n\t [4] Modificar usuario ");
 	printf("\n\t [5] Eliminar usuario ");
+	printf("\n\t [6] Salir ");	
 }
 
 
